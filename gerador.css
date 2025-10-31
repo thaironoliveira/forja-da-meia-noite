@@ -1,0 +1,257 @@
+/* Estilo do Gerador (gerador.css) */
+body {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.container {
+    background-color: #1E1E1E;
+    border: 2px solid #D4AF37;
+    border-radius: 10px;
+    padding: 25px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    position: relative; 
+    z-index: 1;
+}
+h1 {
+    color: #D4AF37;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.aviso {
+    font-size: 0.9em;
+    text-align: center;
+    border: 1px dashed #D4AF37;
+    padding: 10px;
+    border-radius: 5px;
+    color: #AAAAAA;
+    line-height: 1.4;
+}
+.aviso strong { color: #E0E0E0; }
+.gerador-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+label {
+    font-weight: bold;
+    color: #D4AF37;
+}
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #FFF;
+    border-radius: 5px;
+    font-size: 1.1em;
+}
+.opcoes-gerador {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-around;
+    background-color: #222;
+    padding: 15px 10px;
+    border-radius: 5px;
+}
+.opcoes-gerador label {
+    color: #E0E0E0;
+    font-weight: normal;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+input[type="radio"] {
+    accent-color: #D4AF37;
+    width: 16px;
+    height: 16px;
+}
+.premium-tag {
+    color: #121212;
+    background-color: #D4AF37;
+    padding: 2px 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+button#btnGerar {
+    padding: 12px;
+    background-color: #D4AF37;
+    color: #121212;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button#btnGerar:hover { background-color: #FFD700; }
+.resultado-box {
+    margin-top: 25px;
+    text-align: center;
+}
+canvas {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border: 2px solid; 
+    transition: all 0.4s ease;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+canvas.metodo-roda {
+    border-radius: 5px;
+    background-color: #000;
+    border-color: #000; /* Invisível */
+}
+canvas.metodo-tabela {
+    border-radius: 5px;
+    background-color: #050505;
+    border-color: #D4AF37; /* Visível */
+}
+#btnDownloadPNG {
+    display: none; 
+    box-sizing: border-box; 
+    width: 100%;
+    max-width: 300px; 
+    margin: 20px auto 0; 
+    padding: 10px 15px;
+    background-color: #1E1E1E;
+    color: #D4AF37;
+    font-size: 0.9em;
+    font-weight: bold;
+    border: 2px solid #D4AF37;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+#btnDownloadPNG:hover {
+    background-color: #D4AF37;
+    color: #121212;
+}
+#btnDownloadSVG {
+    display: none; 
+    box-sizing: border-box; 
+    width: 100%;
+    max-width: 300px; 
+    margin: 10px auto 0;
+    padding: 10px 15px;
+    background-color: #D4AF37; 
+    color: #121212; 
+    font-size: 0.9em;
+    font-weight: bold;
+    border: 2px solid #D4AF37;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+#btnDownloadSVG:hover {
+    background-color: #FFD700; 
+    border-color: #FFD700;
+}
+#btnDownloadSVG .premium-tag {
+    background-color: #121212; 
+    color: #D4AF37;
+}
+#passosDebug {
+    background-color: #222;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: #AAA;
+    text-align: left;
+}
+#passosDebug p { margin: 5px 0; }
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+}
+#premiumModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1E1E1E;
+    border: 2px solid #D4AF37;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    z-index: 101;
+}
+#premiumModal h2 {
+    color: #D4AF37;
+    text-align: center;
+    margin-top: 0;
+}
+#premiumModal p {
+    color: #E0E0E0;
+    text-align: center;
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2em;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.close-button:hover { color: #FFF; }
+.btn-modal-primario {
+    width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s;
+}
+.btn-modal-primario {
+    background-color: #D4AF37;
+    color: #121212;
+}
+.btn-modal-primario:hover { background-color: #FFD700; }
+/* --- NOVO ESTILO PARA HUD DE STATUS --- */
+.status-usuario {
+    text-align: center;
+    font-size: 0.9em;
+    color: #AAAAAA;
+    background-color: #222;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px dashed #333;
+}
+
+.status-usuario span {
+    font-weight: bold;
+    color: #D4AF37;
+}

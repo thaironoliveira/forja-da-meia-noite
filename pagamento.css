@@ -1,0 +1,129 @@
+/* Estilo da Página de Pagamento (pagamento.css) */
+body {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container-pagamento {
+    background-color: #1E1E1E;
+    border: 2px solid #D4AF37;
+    border-radius: 10px;
+    padding: 30px;
+    width: 100%;
+    max-width: 900px; /* Aumentado para caber os 3 planos */
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+h1 {
+    color: #D4AF37;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.subtitulo-pagamento {
+    text-align: center;
+    color: #AAAAAA;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+/* Container dos Planos */
+.planos-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os planos quebrem a linha em telas menores */
+    justify-content: center;
+    gap: 20px; /* Espaço entre os planos */
+}
+
+.plano-box {
+    text-align: center;
+    background-color: #222;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 25px;
+    width: 250px; /* Largura fixa para cada plano */
+    display: flex;
+    flex-direction: column;
+}
+
+.plano-box h2 {
+    margin-top: 0;
+    color: #E0E0E0;
+}
+
+/* Plano em destaque */
+.plano-destaque {
+    border-color: #D4AF37;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.preco {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #D4AF37;
+    margin-bottom: 10px;
+}
+.preco span {
+    display: block;
+    font-size: 0.4em;
+    font-weight: normal;
+    color: #AAAAAA;
+}
+
+.beneficios-lista {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: left;
+    color: #E0E0E0;
+    font-size: 0.9em;
+    flex-grow: 1; /* Faz a lista crescer para alinhar os botões embaixo */
+}
+.beneficios-lista li {
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.btn-pagar {
+    width: 100%;
+    padding: 12px;
+    background-color: #D4AF37;
+    color: #121212;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+.btn-pagar:hover {
+    background-color: #FFD700;
+}
+
+/* Link para Voltar */
+.voltar-link {
+    color: #D4AF37;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+.voltar-link:hover {
+    text-decoration: underline;
+}
+
+/* Mensagem de Sucesso */
+.msg-sucesso {
+    display: none; /* Começa escondida */
+    color: #D4AF37;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+}

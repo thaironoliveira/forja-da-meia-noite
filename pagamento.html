@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forja da Meia Noite - Planos</title>
+    <link rel="stylesheet" href="pagamento.css">
+</head>
+<body>
+    <div class="container-pagamento">
+        <a href="gerador.html" class="voltar-link">&larr; Voltar ao Gerador</a>
+        
+        <h1>Planos Premium</h1>
+        <p class="subtitulo-pagamento">
+            Desbloqueie todo o poder da Forja.
+        </p>
+
+        <div class="planos-container">
+
+            <div class="plano-box">
+                <h2>Iniciado</h2>
+                <div class="preco">R$ 7,00<span>Pagamento único</span></div>
+                <ul class="beneficios-lista">
+                    <li>✅ <strong>1 Crédito</strong> Premium</li>
+                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Download em SVG (Vetor)</li>
+                </ul>
+                <button class="btn-pagar" data-creditos="1">Comprar 1 Crédito (Simulação)</button>
+            </div>
+
+            <div class="plano-box plano-destaque">
+                <h2>Aprendiz</h2>
+                <div class="preco">R$ 14,00<span>Pagamento único</span></div>
+                <ul class="beneficios-lista">
+                    <li>✅ <strong>3 Créditos</strong> Premium</li>
+                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Download em SVG (Vetor)</li>
+                </ul>
+                <button class="btn-pagar" data-creditos="3">Comprar 3 Créditos (Simulação)</button>
+            </div>
+
+            <div class="plano-box">
+                <h2>Mestre Forjador</h2>
+                <div class="preco">R$ 57,00<span>Pagamento único</span></div>
+                <ul class="beneficios-lista">
+                    <li>✅ <strong>Créditos ILIMITADOS</strong></li>
+                    <li>✅ Acesso <strong>vitalício</strong></li>
+                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Download em SVG (Vetor)</li>
+                </ul>
+                <button class="btn-pagar" data-creditos="999999">Tornar-se Mestre (Simulação)</button>
+            </div>
+
+        </div>
+            
+        <p id="msgSucesso" class="msg-sucesso">
+            Pagamento aprovado! Seus créditos foram adicionados. 
+            Redirecionando de volta ao gerador...
+        </p>
+    </div>
+
+    <script>
+        // Simulação de Pagamento com Créditos
+        const btnsPagamento = document.querySelectorAll('.btn-pagar');
+        const msgSucesso = document.getElementById('msgSucesso');
+
+        btnsPagamento.forEach(botao => {
+            botao.addEventListener('click', () => {
+                // Pega quantos créditos este botão "compra"
+                const creditosComprados = parseInt(botao.dataset.creditos);
+
+                // No mundo real, aqui você processaria o pagamento.
+                // Na nossa simulação, vamos salvar no localStorage.
+
+                // Pega os créditos atuais (se houver) e converte para número
+                let creditosAtuais = parseInt(localStorage.getItem('creditos_usuario')) || 0;
+
+                let creditosFinais;
+                
+                if (creditosComprados >= 999999) {
+                    // Se for o plano ilimitado
+                    creditosFinais = 999999;
+                } else {
+                    // Se for um plano de créditos, SOMA com os atuais
+                    creditosFinais = creditosAtuais + creditosComprados;
+                }
+
+                // Salva os novos créditos no "banco de dados" do navegador
+                localStorage.setItem('creditos_usuario', creditosFinais);
+
+                // Mostra a mensagem de sucesso
+                msgSucesso.style.display = 'block';
+
+                // Redireciona de volta ao gerador após 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'gerador.html';
+                }, 2000); 
+            });
+        });
+    </script>
+</body>
+</html>

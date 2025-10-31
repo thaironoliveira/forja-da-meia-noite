@@ -1,0 +1,76 @@
+/* Estilo da Página de Login (style.css) */
+body {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.login-container {
+    background-color: #1E1E1E;
+    border: 2px solid #D4AF37;
+    border-radius: 10px;
+    padding: 30px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+h1 {
+    color: #D4AF37;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.subtitulo {
+    text-align: center;
+    color: #AAAAAA;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: bold;
+    color: #D4AF37;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.input-group input {
+    padding: 12px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #FFF;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: #D4AF37;
+    color: #121212;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #FFD700;
+}
