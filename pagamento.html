@@ -16,7 +16,6 @@
         </p>
 
         <div class="planos-container">
-
             <div class="plano-box">
                 <h2>Iniciado</h2>
                 <div class="preco">R$ 7,00<span>Pagamento único</span></div>
@@ -25,7 +24,7 @@
                     <li>✅ Use na Tabela Quadrada</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
-                <button class="btn-pagar" data-creditos="1">Comprar 1 Crédito (Simulação)</button>
+                <button class="btn-pagar" data-plano-id="plano_1">Comprar 1 Crédito</button>
             </div>
 
             <div class="plano-box plano-destaque">
@@ -36,7 +35,7 @@
                     <li>✅ Use na Tabela Quadrada</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
-                <button class="btn-pagar" data-creditos="3">Comprar 3 Créditos (Simulação)</button>
+                <button class="btn-pagar" data-plano-id="plano_2">Comprar 3 Créditos</button>
             </div>
 
             <div class="plano-box">
@@ -48,9 +47,8 @@
                     <li>✅ Use na Tabela Quadrada</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
-                <button class="btn-pagar" data-creditos="999999">Tornar-se Mestre (Simulação)</button>
+                <button class="btn-pagar" data-plano-id="plano_3">Tornar-se Mestre</button>
             </div>
-
         </div>
             
         <p id="msgStatus" class="msg-sucesso"></p>
@@ -64,7 +62,6 @@
         const emailUsuario = localStorage.getItem('usuario_email');
 
         if (!emailUsuario) {
-            // Se não souber quem é o usuário, não pode comprar
             msgStatus.style.color = '#FF5555';
             msgStatus.textContent = 'Erro: Usuário não encontrado. Faça login novamente.';
             btnsPagamento.forEach(b => b.disabled = true);
@@ -73,52 +70,35 @@
         btnsPagamento.forEach(botao => {
             botao.addEventListener('click', async () => {
                 
-                // 1. Pega os créditos do botão
-                const creditosComprados = parseInt(botao.dataset.creditos);
+                const planoId = botao.dataset.planoId;
 
                 // 2. Trava os botões
                 btnsPagamento.forEach(b => b.disabled = true);
                 msgStatus.style.color = '#D4AF37';
-                msgStatus.textContent = 'Processando pagamento...';
-
-                /* * No mundo real:
-                 * 1. Aqui você redirecionaria para o Mercado Pago.
-                 * 2. O Mercado Pago, após o pagamento, chamaria um "Webhook" 
-                 * (um "robô" que você ainda não criou, ex: 'processar-webhook.js')
-                 * para adicionar os créditos.
-                 *
-                 * * Na nossa SIMULAÇÃO:
-                 * Vamos chamar o robô 'comprar-creditos.js' diretamente,
-                 * como se o pagamento já tivesse sido aprovado.
-                 */
+                msgStatus.textContent = 'Conectando ao Mercado Pago...';
 
                 try {
-                    // 3. CHAMA O ROBÔ DE COMPRA
-                    const response = await fetch('/.netlify/functions/comprar-creditos', {
+                    // 3. CHAMA O ROBÔ 1 (criar-pagamento.js)
+                    const response = await fetch('/.netlify/functions/criar-pagamento', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                             email: emailUsuario, 
-                            creditosComprados: creditosComprados 
+                            planoId: planoId 
                         })
                     });
 
                     const data = await response.json();
 
                     if (!response.ok) {
-                        throw new Error(data.erro || 'Falha ao adicionar créditos.');
+                        throw new Error(data.erro || 'Falha ao criar link de pagamento.');
                     }
 
                     // 4. SUCESSO!
-                    // Atualiza o localStorage local com os créditos que o Backend confirmou
-                    localStorage.setItem('usuario_creditos', data.creditos);
+                    msgStatus.textContent = 'Redirecionando para o pagamento...';
 
-                    msgStatus.textContent = 'Pagamento aprovado! Redirecionando...';
-
-                    // 5. Redireciona de volta ao gerador
-                    setTimeout(() => {
-                        window.location.href = 'gerador.html';
-                    }, 2000); 
+                    // 5. Redireciona o usuário para o link de checkout REAL
+                    window.location.href = data.link_pagamento;
 
                 } catch (error) {
                     msgStatus.style.color = '#FF5555';

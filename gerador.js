@@ -1,20 +1,26 @@
 /* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' ---
  * */
 
-// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO **********
+// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO (AGORA 100% BACKEND) **********
 
+// 1. Pega os elementos do HUD
 const statusTextoEl = document.getElementById('statusTexto');
 const creditosContadorEl = document.getElementById('creditosContador');
 
+// 2. Lê os dados LOCAIS (só para saber QUEM é o usuário)
 let usuarioEmail = localStorage.getItem('usuario_email');
-let creditosUsuario = parseInt(localStorage.getItem('usuario_creditos')) || 0;
-let isUsuarioPremium = creditosUsuario >= 999999; 
+let creditosUsuario = 0; // Começa com 0 até o Backend nos dizer
+let isUsuarioPremium = false; 
 
+// 3. ATUALIZA O HUD (função visual)
 function atualizarStatusHUD() {
     if (!usuarioEmail) {
+        // Se não houver e-mail, chuta de volta para o login
         window.location.href = 'index.html';
         return;
     }
+    isUsuarioPremium = creditosUsuario >= 999999; 
+
     if (isUsuarioPremium) {
         statusTextoEl.textContent = 'Mestre Forjador';
         creditosContadorEl.textContent = 'Ilimitado';
@@ -24,8 +30,7 @@ function atualizarStatusHUD() {
     }
 }
 
-// ***** FUNÇÃO "GASTAR CRÉDITO" ATUALIZADA *****
-// Esta função agora fala com o Backend (o "robô")
+// 4. FUNÇÃO "GASTAR CRÉDITO" (chama o Robô 2)
 async function gastarCredito() {
     if (isUsuarioPremium) {
         return true; // Ilimitado, sempre pode gastar
@@ -45,27 +50,58 @@ async function gastarCredito() {
         const data = await response.json();
 
         if (!response.ok) {
-            // Se o robô disser "Créditos insuficientes" (erro 402) ou outro erro
             throw new Error(data.erro);
         }
 
         // SUCESSO! O Backend gastou o crédito.
-        // Atualizamos nossos números locais com a resposta do Backend.
-        creditosUsuario = data.creditos;
-        localStorage.setItem('usuario_creditos', creditosUsuario);
+        creditosUsuario = data.creditos; // Atualiza o contador local
+        localStorage.setItem('usuario_creditos', creditosUsuario); // Salva localmente
         atualizarStatusHUD();
         return true;
 
     } catch (error) {
         console.error('Falha ao gastar crédito:', error.message);
-        // Se falhar (ex: sem internet), bloqueia a ação
         alert("Falha ao verificar seus créditos. Tente novamente.");
         return false;
     }
 }
 
-// Atualiza o HUD assim que a página carrega
-atualizarStatusHUD();
+// 5. FUNÇÃO "CARREGAR CRÉDITOS" (chama o Robô 3)
+//    Esta é a função MAIS IMPORTANTE desta página.
+async function carregarCreditosDoBackend() {
+    if (!usuarioEmail) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/.netlify/functions/get-creditos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: usuarioEmail })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) { throw new Error(data.erro); }
+
+        // SUCESSO! Atualiza tudo
+        creditosUsuario = data.creditos;
+        localStorage.setItem('usuario_creditos', creditosUsuario);
+        atualizarStatusHUD();
+
+    } catch (error) {
+        console.error("Erro ao carregar créditos do Supabase:", error.message);
+        // Se falhar, usa o que estava salvo no localStorage
+        creditosUsuario = parseInt(localStorage.getItem('usuario_creditos')) || 0;
+        atualizarStatusHUD();
+    }
+}
+
+// 6. RODA A FUNÇÃO DE CARREGAR CRÉDITOS ASSIM QUE A PÁGINA ABRE
+document.addEventListener('DOMContentLoaded', () => {
+    carregarCreditosDoBackend();
+});
 
 // ***************************************
 
@@ -139,25 +175,21 @@ const ctxReal = tela.getContext('2d');
  */
 
 // Ação do Botão Gerar
-btnGerar.addEventListener('click', async () => { // ** ATUALIZADO para 'async' **
+btnGerar.addEventListener('click', async () => { 
     const sequenciaNumeros = processarTexto();
     const metodoSelecionado = document.querySelector('input[name="metodo"]:checked').value;
     
     if (metodoSelecionado === 'tabela') {
-        // ** ATUALIZADO: agora usa 'await' para esperar a resposta do robô **
         const temCredito = await gastarCredito(); 
         
         if (temCredito) {
-            // Tem créditos, gasta 1 e desenha
             _desenhar(sequenciaNumeros, 'tabela');
         } else {
-            // Não tem créditos
-            document.getElementById('optRoda').checked = true; // Volta para Roda
-            abrirModalPremium(); // Abre o pop-up
-            _desenhar(sequenciaNumeros, 'roda'); // Desenha a Roda (grátis)
+            document.getElementById('optRoda').checked = true; 
+            abrirModalPremium(); 
+            _desenhar(sequenciaNumeros, 'roda'); 
         }
     } else {
-        // Se for a Roda (grátis), desenha sem gastar crédito
         _desenhar(sequenciaNumeros, 'roda');
     }
 });
@@ -374,24 +406,20 @@ optTabela.addEventListener('click', (event) => {
     }
 });
 // "Ouvinte" (Tranca) para o botão de Download SVG
-btnDownloadSVG.addEventListener('click', async (event) => { // ** ATUALIZADO para 'async' **
-    event.preventDefault(); // Sempre previne o download imediato
+btnDownloadSVG.addEventListener('click', async (event) => { 
+    event.preventDefault(); 
     
     if (isUsuarioPremium) {
-        // É Mestre, o download é grátis. Apenas inicia o download.
         window.location.href = btnDownloadSVG.href;
         return;
     }
     
     if (creditosUsuario <= 0) {
-        // Não é Mestre e não tem créditos
         abrirModalPremium();
     } else {
-        // Não é Mestre, mas TEM créditos. Pergunta se quer gastar.
         if (confirm("Você gostaria de gastar 1 crédito Premium para baixar este sigilo em SVG?")) {
-            const sucesso = await gastarCredito(); // Tenta gastar no Backend
+            const sucesso = await gastarCredito(); 
             if (sucesso) {
-                // Se o backend confirmar, inicia o download
                 window.location.href = btnDownloadSVG.href;
             } else {
                 alert("Houve um erro ao processar seu crédito. Tente novamente.");

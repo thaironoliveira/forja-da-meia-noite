@@ -2,6 +2,7 @@
   "name": "forja-da-meia-noite-backend",
   "version": "1.0.0",
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "@supabase/supabase-js": "^2.0.0",
+    "mercadopago": "^1.5.17"
   }
 }
