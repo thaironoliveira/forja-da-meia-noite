@@ -54,16 +54,11 @@ exports.handler = async function(event, context) {
                 failure: `${NETLIFY_SITE_URL}/pagamento.html?pagamento=falha`,
             },
             auto_return: "approved", 
-            notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`,
+            notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`
 
-            // ***** A CURA DO PIX (Correção) *****
-            // O erro "default payment method is excluded" significa
-            // que "pix" é considerado um tipo de "ticket".
-            // Vamos remover a exclusão de "ticket" e deixar SÓ o padrão.
-            payment_methods: {
-                default_payment_method_id: "pix" // Define PIX como padrão
-                // O bloco 'excluded_payment_types' foi REMOVIDO.
-            }
+            // ***** A CORREÇÃO *****
+            // O bloco 'payment_methods' foi COMPLETAMENTE REMOVIDO
+            // para deixar o Mercado Pago usar o checkout padrão.
         };
 
         // 5. Envia o pedido ao Mercado Pago
