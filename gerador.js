@@ -50,6 +50,7 @@ async function gastarCredito() {
         const data = await response.json();
 
         if (!response.ok) {
+            // Se o robô disser "Créditos insuficientes" (erro 402) ou outro erro
             throw new Error(data.erro);
         }
 
