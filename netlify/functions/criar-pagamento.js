@@ -9,7 +9,7 @@ const mercadopago = require('mercadopago');
 const {
     SUPABASE_URL,
     SUPABASE_SERVICE_KEY,
-    MERCADO_PAGO_ACCESS_TOKEN, // <-- CORRIGIDO PARA 2 "S"s
+    MERCADO_PAGO_ACCESS_TOKEN, // Nome correto com 2 "S"s
     NETLIFY_SITE_URL 
 } = process.env;
 
@@ -36,7 +36,7 @@ exports.handler = async function(event, context) {
     try {
         // 3. Configura o Mercado Pago com nossa senha
         mercadopago.configure({
-            access_token: MERCADO_PAGO_ACCESS_TOKEN // <-- CORRIGIDO PARA 2 "S"s
+            access_token: MERCADO_PAGO_ACCESS_TOKEN 
         });
 
         // 4. Cria a "preferência de pagamento"
@@ -56,12 +56,13 @@ exports.handler = async function(event, context) {
             auto_return: "approved", 
             notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`,
 
-            // ***** A CURA DO PIX *****
+            // ***** A CURA DO PIX (Correção) *****
+            // O erro "default payment method is excluded" significa
+            // que "pix" é considerado um tipo de "ticket".
+            // Vamos remover a exclusão de "ticket" e deixar SÓ o padrão.
             payment_methods: {
-                default_payment_method_id: "pix", // Define PIX como padrão
-                excluded_payment_types: [
-                    { "id": "ticket" } // Exclui Boleto (opcional, mas recomendado)
-                ]
+                default_payment_method_id: "pix" // Define PIX como padrão
+                // O bloco 'excluded_payment_types' foi REMOVIDO.
             }
         };
 
