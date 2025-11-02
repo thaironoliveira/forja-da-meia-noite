@@ -12,6 +12,7 @@ let isUsuarioPremium = false;
 
 function atualizarStatusHUD() {
     if (!usuarioEmail) {
+        // Se não houver e-mail, chuta de volta para o login
         window.location.href = 'index.html';
         return;
     }
@@ -398,7 +399,6 @@ btnVerPlanos.addEventListener('click', () => {
 
 // "Ouvinte" (Tranca) para o botão de Tabela Quadrada
 optTabela.addEventListener('click', (event) => {
-    // Agora verifica os créditos REAIS
     if (creditosUsuario <= 0 && !isUsuarioPremium) {
         event.preventDefault(); 
         document.getElementById('optRoda').checked = true;

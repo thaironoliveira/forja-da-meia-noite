@@ -9,7 +9,7 @@ const mercadopago = require('mercadopago');
 const {
     SUPABASE_URL,
     SUPABASE_SERVICE_KEY,
-    MERCADO_PAGO_ACESS_TOKEN, // <-- Corrigido para 1 "S"
+    MERCADO_PAGO_ACCESS_TOKEN, // <-- CORRIGIDO PARA 2 "S"s
     NETLIFY_SITE_URL 
 } = process.env;
 
@@ -36,7 +36,7 @@ exports.handler = async function(event, context) {
     try {
         // 3. Configura o Mercado Pago com nossa senha
         mercadopago.configure({
-            access_token: MERCADO_PAGO_ACESS_TOKEN // <-- Corrigido para 1 "S"
+            access_token: MERCADO_PAGO_ACCESS_TOKEN // <-- CORRIGIDO PARA 2 "S"s
         });
 
         // 4. Cria a "preferência de pagamento"

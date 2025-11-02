@@ -5,22 +5,20 @@
 const { createClient } = require('@supabase/supabase-js');
 const mercadopago = require('mercadopago');
 
-const { SUPABASE_URL, SUPABASE_SERVICE_KEY, MERCADO_PAGO_ACCESS_TOKEN } = process.env;
+const { SUPABASE_URL, SUPABASE_SERVICE_KEY, MERCADO_PAGO_ACCESS_TOKEN } = process.env; // <-- CORRIGIDO PARA 2 "S"s
 
 exports.handler = async function(event, context) {
     
     // 1. Pega os dados que o Mercado Pago enviou
     const pagamento = JSON.parse(event.body);
 
-    // O Mercado Pago só nos avisa o "ID" do pagamento,
-    // precisamos perguntar a ele "quem é esse?"
     if (pagamento.type !== 'payment' || !pagamento.data.id) {
-        return { statusCode: 200 }; // Diz "OK" mas não faz nada
+        return { statusCode: 200 }; 
     }
 
     try {
         // 2. Configura o Mercado Pago
-        mercadopago.configure({ access_token: MERCADO_PAGO_ACCESS_TOKEN });
+        mercadopago.configure({ access_token: MERCADO_PAGO_ACCESS_TOKEN }); // <-- CORRIGIDO PARA 2 "S"s
         
         // 3. Pede os dados completos do pagamento
         const infoPagamento = await mercadopago.payment.get(pagamento.data.id);
