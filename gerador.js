@@ -1,28 +1,20 @@
 /* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' ---
  * */
 
-// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO (AGORA REAL) **********
+// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO **********
 
-// 1. Pega os elementos do HUD
 const statusTextoEl = document.getElementById('statusTexto');
 const creditosContadorEl = document.getElementById('creditosContador');
 
-// 2. Lê os dados do "banco de dados" do navegador (localStorage)
 let usuarioEmail = localStorage.getItem('usuario_email');
 let creditosUsuario = parseInt(localStorage.getItem('usuario_creditos')) || 0;
+let isUsuarioPremium = creditosUsuario >= 999999; 
 
-// 3. Determina o status
-let isUsuarioPremium = creditosUsuario >= 999999; // 999999 = Ilimitado
-
-// 4. Atualiza o HUD na tela
 function atualizarStatusHUD() {
     if (!usuarioEmail) {
-        // Se, por algum motivo, o usuário chegar aqui sem logar,
-        // envia ele de volta para a página de login.
         window.location.href = 'index.html';
         return;
     }
-
     if (isUsuarioPremium) {
         statusTextoEl.textContent = 'Mestre Forjador';
         creditosContadorEl.textContent = 'Ilimitado';
@@ -32,28 +24,47 @@ function atualizarStatusHUD() {
     }
 }
 
-// 5. Função para GASTAR um crédito
-function gastarCredito() {
-    // Esta função agora vai chamar um "robô" backend para fazer isso
-    // (Vamos criar esse robô na próxima etapa)
-    
+// ***** FUNÇÃO "GASTAR CRÉDITO" ATUALIZADA *****
+// Esta função agora fala com o Backend (o "robô")
+async function gastarCredito() {
     if (isUsuarioPremium) {
-        return true; // Sempre pode gastar
+        return true; // Ilimitado, sempre pode gastar
     }
-    if (creditosUsuario > 0) {
-        creditosUsuario--; // Subtrai 1 (temporariamente, na tela)
-        localStorage.setItem('usuario_creditos', creditosUsuario); // Salva no "banco de dados"
+    if (creditosUsuario <= 0) {
+        return false; // Não tem créditos, nem tenta
+    }
+
+    // Tenta gastar o crédito no Backend
+    try {
+        const response = await fetch('/.netlify/functions/gastar-credito', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: usuarioEmail })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Se o robô disser "Créditos insuficientes" (erro 402) ou outro erro
+            throw new Error(data.erro);
+        }
+
+        // SUCESSO! O Backend gastou o crédito.
+        // Atualizamos nossos números locais com a resposta do Backend.
+        creditosUsuario = data.creditos;
+        localStorage.setItem('usuario_creditos', creditosUsuario);
         atualizarStatusHUD();
-        
-        // No futuro, chamaremos o robô aqui para salvar no Supabase
-        // fetch('/.netlify/functions/gastar-credito', { ... });
-        
-        return true; // Sucesso
+        return true;
+
+    } catch (error) {
+        console.error('Falha ao gastar crédito:', error.message);
+        // Se falhar (ex: sem internet), bloqueia a ação
+        alert("Falha ao verificar seus créditos. Tente novamente.");
+        return false;
     }
-    return false; // Sem créditos
 }
 
-// 6. Atualiza o HUD assim que a página carrega
+// Atualiza o HUD assim que a página carrega
 atualizarStatusHUD();
 
 // ***************************************
@@ -128,12 +139,15 @@ const ctxReal = tela.getContext('2d');
  */
 
 // Ação do Botão Gerar
-btnGerar.addEventListener('click', () => {
+btnGerar.addEventListener('click', async () => { // ** ATUALIZADO para 'async' **
     const sequenciaNumeros = processarTexto();
     const metodoSelecionado = document.querySelector('input[name="metodo"]:checked').value;
     
     if (metodoSelecionado === 'tabela') {
-        if (gastarCredito()) {
+        // ** ATUALIZADO: agora usa 'await' para esperar a resposta do robô **
+        const temCredito = await gastarCredito(); 
+        
+        if (temCredito) {
             // Tem créditos, gasta 1 e desenha
             _desenhar(sequenciaNumeros, 'tabela');
         } else {
@@ -360,21 +374,28 @@ optTabela.addEventListener('click', (event) => {
     }
 });
 // "Ouvinte" (Tranca) para o botão de Download SVG
-btnDownloadSVG.addEventListener('click', (event) => {
-    if (creditosUsuario <= 0 && !isUsuarioPremium) {
-        // Usuário Gratuito tentando baixar SVG (mesmo da Roda)
-        event.preventDefault(); 
+btnDownloadSVG.addEventListener('click', async (event) => { // ** ATUALIZADO para 'async' **
+    event.preventDefault(); // Sempre previne o download imediato
+    
+    if (isUsuarioPremium) {
+        // É Mestre, o download é grátis. Apenas inicia o download.
+        window.location.href = btnDownloadSVG.href;
+        return;
+    }
+    
+    if (creditosUsuario <= 0) {
+        // Não é Mestre e não tem créditos
         abrirModalPremium();
-    } else if (!isUsuarioPremium) {
-        // É um usuário com créditos (não ilimitado)
-        // Pergunta se ele quer gastar um crédito no download
+    } else {
+        // Não é Mestre, mas TEM créditos. Pergunta se quer gastar.
         if (confirm("Você gostaria de gastar 1 crédito Premium para baixar este sigilo em SVG?")) {
-            // Se sim, gasta o crédito e deixa o download continuar
-            gastarCredito(); // (Por enquanto, isso só afeta o localStorage)
-        } else {
-            // Se não, previne o download
-            event.preventDefault();
+            const sucesso = await gastarCredito(); // Tenta gastar no Backend
+            if (sucesso) {
+                // Se o backend confirmar, inicia o download
+                window.location.href = btnDownloadSVG.href;
+            } else {
+                alert("Houve um erro ao processar seu crédito. Tente novamente.");
+            }
         }
     }
-    // Se for premium ilimitado, o download simplesmente acontece
 });

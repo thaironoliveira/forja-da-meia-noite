@@ -53,48 +53,78 @@
 
         </div>
             
-        <p id="msgSucesso" class="msg-sucesso">
-            Pagamento aprovado! Seus créditos foram adicionados. 
-            Redirecionando de volta ao gerador...
-        </p>
+        <p id="msgStatus" class="msg-sucesso"></p>
     </div>
 
     <script>
-        // Simulação de Pagamento com Créditos
         const btnsPagamento = document.querySelectorAll('.btn-pagar');
-        const msgSucesso = document.getElementById('msgSucesso');
+        const msgStatus = document.getElementById('msgStatus');
+
+        // Pega o e-mail do usuário que foi salvo no Login
+        const emailUsuario = localStorage.getItem('usuario_email');
+
+        if (!emailUsuario) {
+            // Se não souber quem é o usuário, não pode comprar
+            msgStatus.style.color = '#FF5555';
+            msgStatus.textContent = 'Erro: Usuário não encontrado. Faça login novamente.';
+            btnsPagamento.forEach(b => b.disabled = true);
+        }
 
         btnsPagamento.forEach(botao => {
-            botao.addEventListener('click', () => {
-                // Pega quantos créditos este botão "compra"
+            botao.addEventListener('click', async () => {
+                
+                // 1. Pega os créditos do botão
                 const creditosComprados = parseInt(botao.dataset.creditos);
 
-                // No mundo real, aqui você processaria o pagamento.
-                // Na nossa simulação, vamos salvar no localStorage.
+                // 2. Trava os botões
+                btnsPagamento.forEach(b => b.disabled = true);
+                msgStatus.style.color = '#D4AF37';
+                msgStatus.textContent = 'Processando pagamento...';
 
-                // Pega os créditos atuais (se houver) e converte para número
-                let creditosAtuais = parseInt(localStorage.getItem('creditos_usuario')) || 0;
+                /* * No mundo real:
+                 * 1. Aqui você redirecionaria para o Mercado Pago.
+                 * 2. O Mercado Pago, após o pagamento, chamaria um "Webhook" 
+                 * (um "robô" que você ainda não criou, ex: 'processar-webhook.js')
+                 * para adicionar os créditos.
+                 *
+                 * * Na nossa SIMULAÇÃO:
+                 * Vamos chamar o robô 'comprar-creditos.js' diretamente,
+                 * como se o pagamento já tivesse sido aprovado.
+                 */
 
-                let creditosFinais;
-                
-                if (creditosComprados >= 999999) {
-                    // Se for o plano ilimitado
-                    creditosFinais = 999999;
-                } else {
-                    // Se for um plano de créditos, SOMA com os atuais
-                    creditosFinais = creditosAtuais + creditosComprados;
+                try {
+                    // 3. CHAMA O ROBÔ DE COMPRA
+                    const response = await fetch('/.netlify/functions/comprar-creditos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            email: emailUsuario, 
+                            creditosComprados: creditosComprados 
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.erro || 'Falha ao adicionar créditos.');
+                    }
+
+                    // 4. SUCESSO!
+                    // Atualiza o localStorage local com os créditos que o Backend confirmou
+                    localStorage.setItem('usuario_creditos', data.creditos);
+
+                    msgStatus.textContent = 'Pagamento aprovado! Redirecionando...';
+
+                    // 5. Redireciona de volta ao gerador
+                    setTimeout(() => {
+                        window.location.href = 'gerador.html';
+                    }, 2000); 
+
+                } catch (error) {
+                    msgStatus.style.color = '#FF5555';
+                    msgStatus.textContent = error.message;
+                    btnsPagamento.forEach(b => b.disabled = false);
                 }
-
-                // Salva os novos créditos no "banco de dados" do navegador
-                localStorage.setItem('creditos_usuario', creditosFinais);
-
-                // Mostra a mensagem de sucesso
-                msgSucesso.style.display = 'block';
-
-                // Redireciona de volta ao gerador após 2 segundos
-                setTimeout(() => {
-                    window.location.href = 'gerador.html';
-                }, 2000); 
             });
         });
     </script>
