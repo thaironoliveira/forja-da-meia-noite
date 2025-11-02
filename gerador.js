@@ -1,20 +1,28 @@
 /* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' ---
  * */
 
-// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO **********
+// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO (AGORA REAL) **********
 
 // 1. Pega os elementos do HUD
 const statusTextoEl = document.getElementById('statusTexto');
 const creditosContadorEl = document.getElementById('creditosContador');
 
-// 2. Lê os créditos do "banco de dados" do navegador (localStorage)
-let creditosUsuario = parseInt(localStorage.getItem('creditos_usuario')) || 0;
+// 2. Lê os dados do "banco de dados" do navegador (localStorage)
+let usuarioEmail = localStorage.getItem('usuario_email');
+let creditosUsuario = parseInt(localStorage.getItem('usuario_creditos')) || 0;
 
 // 3. Determina o status
 let isUsuarioPremium = creditosUsuario >= 999999; // 999999 = Ilimitado
 
 // 4. Atualiza o HUD na tela
 function atualizarStatusHUD() {
+    if (!usuarioEmail) {
+        // Se, por algum motivo, o usuário chegar aqui sem logar,
+        // envia ele de volta para a página de login.
+        window.location.href = 'index.html';
+        return;
+    }
+
     if (isUsuarioPremium) {
         statusTextoEl.textContent = 'Mestre Forjador';
         creditosContadorEl.textContent = 'Ilimitado';
@@ -26,13 +34,20 @@ function atualizarStatusHUD() {
 
 // 5. Função para GASTAR um crédito
 function gastarCredito() {
+    // Esta função agora vai chamar um "robô" backend para fazer isso
+    // (Vamos criar esse robô na próxima etapa)
+    
     if (isUsuarioPremium) {
         return true; // Sempre pode gastar
     }
     if (creditosUsuario > 0) {
-        creditosUsuario--; // Subtrai 1
-        localStorage.setItem('creditos_usuario', creditosUsuario); // Salva no "banco de dados"
+        creditosUsuario--; // Subtrai 1 (temporariamente, na tela)
+        localStorage.setItem('usuario_creditos', creditosUsuario); // Salva no "banco de dados"
         atualizarStatusHUD();
+        
+        // No futuro, chamaremos o robô aqui para salvar no Supabase
+        // fetch('/.netlify/functions/gastar-credito', { ... });
+        
         return true; // Sucesso
     }
     return false; // Sem créditos
@@ -337,6 +352,7 @@ btnVerPlanos.addEventListener('click', () => {
 
 // "Ouvinte" (Tranca) para o botão de Tabela Quadrada
 optTabela.addEventListener('click', (event) => {
+    // Agora verifica os créditos REAIS
     if (creditosUsuario <= 0 && !isUsuarioPremium) {
         event.preventDefault(); 
         document.getElementById('optRoda').checked = true;
@@ -354,7 +370,7 @@ btnDownloadSVG.addEventListener('click', (event) => {
         // Pergunta se ele quer gastar um crédito no download
         if (confirm("Você gostaria de gastar 1 crédito Premium para baixar este sigilo em SVG?")) {
             // Se sim, gasta o crédito e deixa o download continuar
-            gastarCredito();
+            gastarCredito(); // (Por enquanto, isso só afeta o localStorage)
         } else {
             // Se não, previne o download
             event.preventDefault();

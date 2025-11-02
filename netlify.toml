@@ -1,0 +1,6 @@
+# Este é o "mapa" que diz ao Netlify
+# onde encontrar nossos "robôs" (Funções Serverless)
+
+[build]
+  # Esta é a pasta onde nossos robôs vão morar
+  functions = "netlify/functions/"
