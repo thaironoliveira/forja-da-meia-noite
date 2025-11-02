@@ -57,9 +57,15 @@
     <script>
         const btnsPagamento = document.querySelectorAll('.btn-pagar');
         const msgStatus = document.getElementById('msgStatus');
-
-        // Pega o e-mail do usuário que foi salvo no Login
         const emailUsuario = localStorage.getItem('usuario_email');
+
+        // ** A CURA DO BOTÃO PRESO **
+        // Esta função roda toda vez que a página (re)aparece
+        window.addEventListener('pageshow', function(event) {
+            // Re-abilita todos os botões e limpa a mensagem
+            btnsPagamento.forEach(b => b.disabled = false);
+            msgStatus.textContent = '';
+        });
 
         if (!emailUsuario) {
             msgStatus.style.color = '#FF5555';
@@ -89,20 +95,16 @@
                     });
 
                     const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.erro || 'Falha ao criar link de pagamento.');
-                    }
+                    if (!response.ok) { throw new Error(data.erro || 'Falha ao criar link de pagamento.'); }
 
                     // 4. SUCESSO!
                     msgStatus.textContent = 'Redirecionando para o pagamento...';
-
-                    // 5. Redireciona o usuário para o link de checkout REAL
                     window.location.href = data.link_pagamento;
 
                 } catch (error) {
                     msgStatus.style.color = '#FF5555';
                     msgStatus.textContent = error.message;
+                    // Re-abilita botões se der erro
                     btnsPagamento.forEach(b => b.disabled = false);
                 }
             });

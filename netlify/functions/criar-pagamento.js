@@ -9,8 +9,8 @@ const mercadopago = require('mercadopago');
 const {
     SUPABASE_URL,
     SUPABASE_SERVICE_KEY,
-    MERCADO_PAGO_ACCESS_TOKEN,
-    NETLIFY_SITE_URL // Esta é uma URL que o Netlify nos dá
+    MERCADO_PAGO_ACESS_TOKEN, // <-- Corrigido para 1 "S"
+    NETLIFY_SITE_URL 
 } = process.env;
 
 exports.handler = async function(event, context) {
@@ -36,7 +36,7 @@ exports.handler = async function(event, context) {
     try {
         // 3. Configura o Mercado Pago com nossa senha
         mercadopago.configure({
-            access_token: MERCADO_PAGO_ACCESS_TOKEN
+            access_token: MERCADO_PAGO_ACESS_TOKEN // <-- Corrigido para 1 "S"
         });
 
         // 4. Cria a "preferência de pagamento"
@@ -48,19 +48,21 @@ exports.handler = async function(event, context) {
                     quantity: 1,
                 }
             ],
-            // A "Etiqueta" Mágica!
-            // Diz ao MP para qual e-mail e quantos créditos são.
             external_reference: `${email}|${plano.creditos}`,
-            
-            // Para onde o cliente volta após pagar
             back_urls: {
                 success: `${NETLIFY_SITE_URL}/gerador.html?pagamento=sucesso`,
                 failure: `${NETLIFY_SITE_URL}/pagamento.html?pagamento=falha`,
             },
-            auto_return: "approved", // Retorna automaticamente
+            auto_return: "approved", 
+            notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`,
 
-            // Onde o Mercado Pago vai nos avisar (o Webhook)
-            notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`
+            // ***** A CURA DO PIX *****
+            payment_methods: {
+                default_payment_method_id: "pix", // Define PIX como padrão
+                excluded_payment_types: [
+                    { "id": "ticket" } // Exclui Boleto (opcional, mas recomendado)
+                ]
+            }
         };
 
         // 5. Envia o pedido ao Mercado Pago

@@ -1,21 +1,17 @@
-/* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' ---
+/* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' (LIMPO E RÁPIDO) ---
  * */
 
-// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO (AGORA 100% BACKEND) **********
+// ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO **********
 
-// 1. Pega os elementos do HUD
 const statusTextoEl = document.getElementById('statusTexto');
 const creditosContadorEl = document.getElementById('creditosContador');
 
-// 2. Lê os dados LOCAIS (só para saber QUEM é o usuário)
 let usuarioEmail = localStorage.getItem('usuario_email');
-let creditosUsuario = 0; // Começa com 0 até o Backend nos dizer
+let creditosUsuario = 0; 
 let isUsuarioPremium = false; 
 
-// 3. ATUALIZA O HUD (função visual)
 function atualizarStatusHUD() {
     if (!usuarioEmail) {
-        // Se não houver e-mail, chuta de volta para o login
         window.location.href = 'index.html';
         return;
     }
@@ -30,33 +26,25 @@ function atualizarStatusHUD() {
     }
 }
 
-// 4. FUNÇÃO "GASTAR CRÉDITO" (chama o Robô 2)
 async function gastarCredito() {
     if (isUsuarioPremium) {
-        return true; // Ilimitado, sempre pode gastar
+        return true; 
     }
     if (creditosUsuario <= 0) {
-        return false; // Não tem créditos, nem tenta
+        return false; 
     }
 
-    // Tenta gastar o crédito no Backend
     try {
         const response = await fetch('/.netlify/functions/gastar-credito', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: usuarioEmail })
         });
-
         const data = await response.json();
+        if (!response.ok) { throw new Error(data.erro); }
 
-        if (!response.ok) {
-            // Se o robô disser "Créditos insuficientes" (erro 402) ou outro erro
-            throw new Error(data.erro);
-        }
-
-        // SUCESSO! O Backend gastou o crédito.
-        creditosUsuario = data.creditos; // Atualiza o contador local
-        localStorage.setItem('usuario_creditos', creditosUsuario); // Salva localmente
+        creditosUsuario = data.creditos; 
+        localStorage.setItem('usuario_creditos', creditosUsuario); 
         atualizarStatusHUD();
         return true;
 
@@ -67,9 +55,7 @@ async function gastarCredito() {
     }
 }
 
-// 5. FUNÇÃO "CARREGAR CRÉDITOS" (chama o Robô 3)
-//    Esta é a função MAIS IMPORTANTE desta página.
-async function carregarCreditosDoBackend() {
+async function carregarCreditosDoBackend(tentativas = 0) {
     if (!usuarioEmail) {
         window.location.href = 'index.html';
         return;
@@ -81,29 +67,43 @@ async function carregarCreditosDoBackend() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: usuarioEmail })
         });
-        
         const data = await response.json();
-        
         if (!response.ok) { throw new Error(data.erro); }
 
-        // SUCESSO! Atualiza tudo
+        // Pega os créditos antigos para comparar
+        const creditosAntigos = parseInt(localStorage.getItem('usuario_creditos')) || 0;
+        
         creditosUsuario = data.creditos;
         localStorage.setItem('usuario_creditos', creditosUsuario);
         atualizarStatusHUD();
 
+        // ** A MÁGICA DA ATUALIZAÇÃO AUTOMÁTICA **
+        // Se viemos de um pagamento E os créditos AINDA não foram atualizados...
+        if (veioDoPagamento && creditosUsuario === creditosAntigos && tentativas < 5) {
+            // ...mostra um aviso e tenta de novo em 3 segundos.
+            statusTextoEl.textContent = 'Confirmando pagamento...';
+            creditosContadorEl.textContent = 'aguarde';
+            setTimeout(() => carregarCreditosDoBackend(tentativas + 1), 3000); // Tenta de novo
+        } else if (veioDoPagamento) {
+            // Créditos foram atualizados! Limpa a URL
+            history.replaceState(null, '', window.location.pathname);
+        }
+
     } catch (error) {
-        console.error("Erro ao carregar créditos do Supabase:", error.message);
-        // Se falhar, usa o que estava salvo no localStorage
+        console.error("Erro ao carregar créditos:", error.message);
         creditosUsuario = parseInt(localStorage.getItem('usuario_creditos')) || 0;
         atualizarStatusHUD();
     }
 }
 
-// 6. RODA A FUNÇÃO DE CARREGAR CRÉDITOS ASSIM QUE A PÁGINA ABRE
-document.addEventListener('DOMContentLoaded', () => {
-    carregarCreditosDoBackend();
-});
+// Verifica se o usuário acabou de voltar do Mercado Pago
+const urlParams = new URLSearchParams(window.location.search);
+const veioDoPagamento = urlParams.get('pagamento') === 'sucesso';
 
+// RODA A FUNÇÃO DE CARREGAR CRÉDITOS ASSIM QUE A PÁGINA ABRE
+document.addEventListener('DOMContentLoaded', () => {
+    carregarCreditosDoBackend(0); // Inicia a verificação
+});
 // ***************************************
 
 
@@ -254,7 +254,6 @@ function processarTexto() {
 
 /*
  * PASSO 5: FUNÇÕES DE DESENHO
- * (Sem alterações, 100% corretas)
  */
 function desenharFundo(pincel, metodo) {
     if (metodo === 'tabela') {
