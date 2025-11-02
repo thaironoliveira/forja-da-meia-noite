@@ -9,9 +9,13 @@ const mercadopago = require('mercadopago');
 const {
     SUPABASE_URL,
     SUPABASE_SERVICE_KEY,
-    MERCADO_PAGO_ACCESS_TOKEN, // Nome correto com 2 "S"s
-    NETLIFY_SITE_URL 
+    MERCADO_PAGO_ACCESS_TOKEN // Nome correto com 2 "S"s
+    // A variável NETLIFY_SITE_URL foi removida
 } = process.env;
+
+// ***** A CORREÇÃO ESTÁ AQUI *****
+// Colocamos seu link "chumbado" (hardcoded) para garantir que funcione
+const MEU_SITE_URL = "https://luxury-sfogliatella-c08e2d.netlify.app";
 
 exports.handler = async function(event, context) {
     
@@ -49,16 +53,14 @@ exports.handler = async function(event, context) {
                 }
             ],
             external_reference: `${email}|${plano.creditos}`,
+            
+            // ***** USA A VARIÁVEL "CHUMBADA" *****
             back_urls: {
-                success: `${NETLIFY_SITE_URL}/gerador.html?pagamento=sucesso`,
-                failure: `${NETLIFY_SITE_URL}/pagamento.html?pagamento=falha`,
+                success: `${MEU_SITE_URL}/gerador.html?pagamento=sucesso`,
+                failure: `${MEU_SITE_URL}/pagamento.html?pagamento=falha`,
             },
             auto_return: "approved", 
-            notification_url: `${NETLIFY_SITE_URL}/.netlify/functions/processar-pagamento`
-
-            // ***** A CORREÇÃO *****
-            // O bloco 'payment_methods' foi COMPLETAMENTE REMOVIDO
-            // para deixar o Mercado Pago usar o checkout padrão.
+            notification_url: `${MEU_SITE_URL}/.netlify/functions/processar-pagamento`
         };
 
         // 5. Envia o pedido ao Mercado Pago
