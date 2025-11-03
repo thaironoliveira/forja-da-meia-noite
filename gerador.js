@@ -1,22 +1,29 @@
-/* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' (LIMPO E RÁPIDO) ---
+/* * * --- INÍCIO DO NOSSO SCRIPT 'gerador.js' ---
  * */
 
 // ********** LÓGICA DE CRÉDITOS E STATUS DO USUÁRIO **********
 
 const statusTextoEl = document.getElementById('statusTexto');
 const creditosContadorEl = document.getElementById('creditosContador');
+const btnSair = document.getElementById('btnSair'); 
 
 let usuarioEmail = localStorage.getItem('usuario_email');
 let creditosUsuario = 0; 
-let isUsuarioPremium = false; 
+
+// --- !!! ACESSO ADMIN !!! ---
+// Coloque SEU email aqui para ter acesso premium grátis para sempre
+const ADMIN_EMAIL = "thairon77@gmail.com";
+// --- !!! FIM ADMIN !!! ---
+
+let isUsuarioPremium = (usuarioEmail === ADMIN_EMAIL); 
 
 function atualizarStatusHUD() {
     if (!usuarioEmail) {
-        // Se não houver e-mail, chuta de volta para o login
         window.location.href = 'index.html';
         return;
     }
-    isUsuarioPremium = creditosUsuario >= 999999; 
+    // Re-checa o status premium
+    isUsuarioPremium = (creditosUsuario >= 999999) || (usuarioEmail === ADMIN_EMAIL); 
 
     if (isUsuarioPremium) {
         statusTextoEl.textContent = 'Mestre Forjador';
@@ -71,22 +78,17 @@ async function carregarCreditosDoBackend(tentativas = 0) {
         const data = await response.json();
         if (!response.ok) { throw new Error(data.erro); }
 
-        // Pega os créditos antigos para comparar
         const creditosAntigos = parseInt(localStorage.getItem('usuario_creditos')) || 0;
         
         creditosUsuario = data.creditos;
         localStorage.setItem('usuario_creditos', creditosUsuario);
         atualizarStatusHUD();
 
-        // ** A MÁGICA DA ATUALIZAÇÃO AUTOMÁTICA **
-        // Se viemos de um pagamento E os créditos AINDA não foram atualizados...
         if (veioDoPagamento && creditosUsuario === creditosAntigos && tentativas < 5) {
-            // ...mostra um aviso e tenta de novo em 3 segundos.
             statusTextoEl.textContent = 'Confirmando pagamento...';
             creditosContadorEl.textContent = 'aguarde';
-            setTimeout(() => carregarCreditosDoBackend(tentativas + 1), 3000); // Tenta de novo
+            setTimeout(() => carregarCreditosDoBackend(tentativas + 1), 3000); 
         } else if (veioDoPagamento) {
-            // Créditos foram atualizados! Limpa a URL
             history.replaceState(null, '', window.location.pathname);
         }
 
@@ -97,13 +99,11 @@ async function carregarCreditosDoBackend(tentativas = 0) {
     }
 }
 
-// Verifica se o usuário acabou de voltar do Mercado Pago
 const urlParams = new URLSearchParams(window.location.search);
 const veioDoPagamento = urlParams.get('pagamento') === 'sucesso';
 
-// RODA A FUNÇÃO DE CARREGAR CRÉDITOS ASSIM QUE A PÁGINA ABRE
 document.addEventListener('DOMContentLoaded', () => {
-    carregarCreditosDoBackend(0); // Inicia a verificação
+    carregarCreditosDoBackend(0); 
 });
 // ***************************************
 
@@ -158,13 +158,13 @@ const debugNumerosEl = document.getElementById('debugNumeros');
 
 const btnDownloadPNG = document.getElementById('btnDownloadPNG'); 
 const btnDownloadSVG = document.getElementById('btnDownloadSVG'); 
-const optTabela = document.getElementById('labelTabela'); // O label da Tabela
+const optRoda = document.getElementById('labelRoda'); // <-- MUDOU: Agora pegamos a RODA
 
 // Elementos do Modal de "Upgrade"
 const premiumModal = document.getElementById('premiumModal');
 const overlay = document.getElementById('overlay');
 const btnCloseModal = document.getElementById('btnCloseModal');
-const btnVerPlanos = document.querySelector('.btn-modal-primario'); // Botão no pop-up
+const btnVerPlanos = document.querySelector('.btn-modal-primario'); 
 
 // Pincel do canvas
 tela.width = 300;
@@ -181,18 +181,20 @@ btnGerar.addEventListener('click', async () => {
     const sequenciaNumeros = processarTexto();
     const metodoSelecionado = document.querySelector('input[name="metodo"]:checked').value;
     
-    if (metodoSelecionado === 'tabela') {
+    // ** LÓGICA INVERTIDA **
+    if (metodoSelecionado === 'roda') {
         const temCredito = await gastarCredito(); 
         
         if (temCredito) {
-            _desenhar(sequenciaNumeros, 'tabela');
+            _desenhar(sequenciaNumeros, 'roda');
         } else {
-            document.getElementById('optRoda').checked = true; 
+            document.getElementById('optTabela').checked = true; // Volta para Tabela
             abrirModalPremium(); 
-            _desenhar(sequenciaNumeros, 'roda'); 
+            _desenhar(sequenciaNumeros, 'tabela'); // Desenha a Tabela (grátis)
         }
     } else {
-        _desenhar(sequenciaNumeros, 'roda');
+        // Se for a Tabela (grátis), desenha sem gastar crédito
+        _desenhar(sequenciaNumeros, 'tabela');
     }
 });
 
@@ -260,7 +262,7 @@ function desenharFundo(pincel, metodo) {
     if (metodo === 'tabela') {
         tela.className = 'metodo-tabela'; 
         desenharTabelaAssistente(pincel);    
-        desenharNumerosTabela(pincel);         
+        desenharNumerosTabela(pincel); // Números desenhados PRIMEIRO
     } else {
         tela.className = 'metodo-roda'; 
         desenharRodaNumerica(pincel);
@@ -300,15 +302,23 @@ function desenharRodaNumerica(pincel) {
         }
     }
 }
+
+// ** FUNÇÃO DA TABELA ATUALIZADA (com 70% de suavização) **
 function desenharNumerosTabela(pincel) {
+    pincel.save(); // Salva o estado atual do pincel
+    
     pincel.fillStyle = '#D4AF37'; 
+    pincel.globalAlpha = 0.3; // 70% suave (30% opaco)
     pincel.font = 'bold 20px Arial';
     pincel.textAlign = 'center';
     pincel.textBaseline = 'middle';
+    
     for (let i = 1; i <= 9; i++) {
         let pos = PONTOS_SIGILO_TABELA[i]; 
         pincel.fillText(i.toString(), pos.x, pos.y);
     }
+    
+    pincel.restore(); // Restaura o pincel (globalAlpha volta para 1.0)
 }
 function desenharTabelaAssistente(pincel) {
     pincel.strokeStyle = '#333';
@@ -342,7 +352,7 @@ function desenharCaminhoDoSigilo(pincel, numeros, posicoes) {
     if (posicoes[ultimoNumero]) {
         let posFinal = posicoes[ultimoNumero];
         pincel.moveTo(posFinal.x, posFinal.y);
-        pincel.lineTo(posFinal.x + 8, posFinal.y + 8); 
+        pincel.lineTo(posFinal.x + 8, posFinal.x + 8); 
     }
 }
 function desenharSigiloNaTela(pincel, metodo, numeros, isSvg = false) {
@@ -380,7 +390,7 @@ function desenharSigiloNaTela(pincel, metodo, numeros, isSvg = false) {
     }
 }
 
-/* ************ LÓGICA DO MODAL DE UPGRADE ************ */
+/* ************ LÓGICA DO MODAL DE UPGRADE E LOGOUT ************ */
 function abrirModalPremium() {
     overlay.style.display = 'block';
     premiumModal.style.display = 'block';
@@ -397,11 +407,12 @@ btnVerPlanos.addEventListener('click', () => {
     window.location.href = 'pagamento.html';
 });
 
-// "Ouvinte" (Tranca) para o botão de Tabela Quadrada
-optTabela.addEventListener('click', (event) => {
+// ** LÓGICA INVERTIDA **
+// "Ouvinte" (Tranca) para o botão de Roda Numérica
+optRoda.addEventListener('click', (event) => {
     if (creditosUsuario <= 0 && !isUsuarioPremium) {
         event.preventDefault(); 
-        document.getElementById('optRoda').checked = true;
+        document.getElementById('optTabela').checked = true; // Volta para Tabela
         abrirModalPremium();
     }
 });
@@ -425,5 +436,14 @@ btnDownloadSVG.addEventListener('click', async (event) => {
                 alert("Houve um erro ao processar seu crédito. Tente novamente.");
             }
         }
+    }
+});
+
+// "Ouvinte" para o botão "Sair" (Logout)
+btnSair.addEventListener('click', () => {
+    if (confirm("Você tem certeza que deseja sair?")) {
+        localStorage.removeItem('usuario_email');
+        localStorage.removeItem('usuario_creditos');
+        window.location.href = 'index.html';
     }
 });

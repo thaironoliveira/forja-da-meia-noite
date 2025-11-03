@@ -9,11 +9,15 @@
 <body>
     <div class="container">
         <h1>Forja da Meia Noite</h1>
-        <div id="statusUsuario" class="status-usuario">
-    Status: <span id="statusTexto">Usuário Gratuito</span>
-    (<span id="creditosContador">0</span> créditos Premium)
-</div>
         
+        <div id="statusUsuario" class="status-usuario">
+            <div class="status-info">
+                Status: <span id="statusTexto">Usuário Gratuito</span>
+                (<span id="creditosContador">0</span> créditos Premium)
+            </div>
+            <button id="btnSair" class="btn-sair">Sair</button>
+        </div>
+
         <p class="aviso">
             <strong>Atenção:</strong> Esta ferramenta <strong>não substitui</strong> os sagrados "Pontos Riscados" 
             firmados por entidades.
@@ -29,24 +33,20 @@
             
             <div class="opcoes-gerador">
                 <label>
-                    <input type="radio" id="optRoda" name="metodo" value="roda" checked>
-                    Roda Numérica (Grátis)
+                    <input type="radio" id="optTabela" name="metodo" value="tabela" checked>
+                    Tabela Quadrada (Grátis)
                 </label>
-                <label id="labelTabela"> <input type="radio" id="optTabela" name="metodo" value="tabela">
-                    Tabela Quadrada
-                    <span class="premium-tag">Premium</span>
-                </label>
+                <label id="labelRoda"> <input type="radio" id="optRoda" name="metodo" value="roda">
+                    Roda Numérica
+                    <span class="premium-tag">Premium</span> </label>
             </div>
-
             <button id="btnGerar">Gerar Sigilo</button>
         </div>
 
         <div class="resultado-box">
             <h3>Seu Sigilo:</h3>
             
-            <canvas id="telaSigilo" class="metodo-roda"></canvas>
-            
-            <a id="btnDownloadPNG" download="sigilo_forja_da_meia_noite.png">
+            <canvas id="telaSigilo" class="metodo-tabela"></canvas> <a id="btnDownloadPNG" download="sigilo_forja_da_meia_noite.png">
                 Baixar Sigilo (PNG)
             </a>
             
@@ -64,17 +64,21 @@
     <div id="overlay"></div>
     <div id="premiumModal" class="modal">
         <button id="btnCloseModal" class="close-button">&times;</button>
-        <h2>Torne-se Premium</h2>
+        <h2>Função Premium</h2>
         <p>
-            A "Tabela Quadrada" e o download em "SVG" (vetor) 
+            A "Roda Numérica" e o download em "SVG" (vetor) 
             são recursos exclusivos para membros Premium.
         </p>
         <p>
             O formato SVG tem qualidade perfeita e infinita, ideal para 
             tatuagens, quadros e designs profissionais.
         </p>
-        <button class="btn-modal-primario">Ver Planos de Upgrade</button>
+        <button class="btn-modal-primario" id="btnIrParaPlanos">Ver Planos de Upgrade</button>
     </div>
+
+    <footer class="site-footer">
+        © 2025 Forja da Meia Noite. Todos os direitos reservados.
+    </footer>
 
     <script src="canvas2svg.min.js"></script>
     <script src="gerador.js"></script>

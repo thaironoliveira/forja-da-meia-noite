@@ -4,6 +4,7 @@ body {
     color: #E0E0E0;
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column; /* Alterado para coluna */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -19,6 +20,7 @@ body {
     width: 100%;
     max-width: 450px;
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    z-index: 1; /* Para garantir que fique acima de qualquer fundo */
 }
 
 h1 {
@@ -73,4 +75,19 @@ h1 {
 
 .btn-login:hover {
     background-color: #FFD700;
+}
+
+#formMensagem {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+/* NOVO ESTILO DE RODAPÉ */
+.site-footer {
+    width: 100%;
+    text-align: center;
+    color: #555;
+    font-size: 0.8em;
+    padding-top: 30px; /* Dá um espaço acima do rodapé */
 }

@@ -4,6 +4,7 @@ body {
     color: #E0E0E0;
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column; /* Alterado para coluna */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -26,6 +27,40 @@ h1 {
     text-align: center;
     margin-bottom: 15px;
 }
+
+/* --- ESTILO DO HUD DE STATUS ATUALIZADO --- */
+.status-usuario {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    font-size: 0.9em;
+    color: #AAAAAA;
+    background-color: #222;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px dashed #333;
+}
+.status-info span {
+    font-weight: bold;
+    color: #D4AF37;
+}
+.btn-sair {
+    background: none;
+    border: 1px solid #D4AF37;
+    color: #D4AF37;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-sair:hover {
+    background-color: #D4AF37;
+    color: #121212;
+}
+
 .aviso {
     font-size: 0.9em;
     text-align: center;
@@ -239,19 +274,12 @@ canvas.metodo-tabela {
     color: #121212;
 }
 .btn-modal-primario:hover { background-color: #FFD700; }
-/* --- NOVO ESTILO PARA HUD DE STATUS --- */
-.status-usuario {
-    text-align: center;
-    font-size: 0.9em;
-    color: #AAAAAA;
-    background-color: #222;
-    padding: 8px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    border: 1px dashed #333;
-}
 
-.status-usuario span {
-    font-weight: bold;
-    color: #D4AF37;
+/* NOVO ESTILO DE RODAPÉ */
+.site-footer {
+    width: 100%;
+    text-align: center;
+    color: #555;
+    font-size: 0.8em;
+    padding-top: 30px; /* Dá um espaço acima do rodapé */
 }

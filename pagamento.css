@@ -4,6 +4,7 @@ body {
     color: #E0E0E0;
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column; /* Alterado para coluna */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -17,8 +18,9 @@ body {
     border-radius: 10px;
     padding: 30px;
     width: 100%;
-    max-width: 900px; /* Aumentado para caber os 3 planos */
+    max-width: 900px; 
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    z-index: 1; /* Para garantir que fique acima de qualquer fundo */
 }
 
 h1 {
@@ -38,9 +40,9 @@ h1 {
 /* Container dos Planos */
 .planos-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que os planos quebrem a linha em telas menores */
+    flex-wrap: wrap; 
     justify-content: center;
-    gap: 20px; /* Espaço entre os planos */
+    gap: 20px; 
 }
 
 .plano-box {
@@ -49,7 +51,7 @@ h1 {
     border: 2px solid #333;
     border-radius: 8px;
     padding: 25px;
-    width: 250px; /* Largura fixa para cada plano */
+    width: 250px; 
     display: flex;
     flex-direction: column;
 }
@@ -59,7 +61,6 @@ h1 {
     color: #E0E0E0;
 }
 
-/* Plano em destaque */
 .plano-destaque {
     border-color: #D4AF37;
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
@@ -85,7 +86,7 @@ h1 {
     text-align: left;
     color: #E0E0E0;
     font-size: 0.9em;
-    flex-grow: 1; /* Faz a lista crescer para alinhar os botões embaixo */
+    flex-grow: 1; 
 }
 .beneficios-lista li {
     margin-bottom: 12px;
@@ -109,7 +110,6 @@ h1 {
     background-color: #FFD700;
 }
 
-/* Link para Voltar */
 .voltar-link {
     color: #D4AF37;
     text-decoration: none;
@@ -119,11 +119,19 @@ h1 {
     text-decoration: underline;
 }
 
-/* Mensagem de Sucesso */
 .msg-sucesso {
-    display: none; /* Começa escondida */
+    display: none; 
     color: #D4AF37;
     font-weight: bold;
     margin-top: 20px;
     text-align: center;
+}
+
+/* NOVO ESTILO DE RODAPÉ */
+.site-footer {
+    width: 100%;
+    text-align: center;
+    color: #555;
+    font-size: 0.8em;
+    padding-top: 30px; /* Dá um espaço acima do rodapé */
 }

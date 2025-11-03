@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Forja da Meia Noite - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -37,62 +37,43 @@
         </form>
     </div>
 
+    <footer class="site-footer">
+        © 2025 Forja da Meia Noite. Todos os direitos reservados.
+    </footer>
+
     <script>
         const loginForm = document.getElementById('loginForm');
         const btnLogin = document.getElementById('btnLogin');
         const formMensagem = document.getElementById('formMensagem');
-
         loginForm.addEventListener('submit', async function(event) {
-            // Previne o envio real do formulário
             event.preventDefault(); 
-            
-            // 1. Pega os dados do formulário
             const nome = document.getElementById('nome').value;
             const email = document.getElementById('email').value;
             const whatsapp = document.getElementById('whatsapp').value;
-
             if (!email) {
                 formMensagem.style.color = '#FF5555';
                 formMensagem.textContent = 'Por favor, insira seu e-mail.';
                 return;
             }
-            
-            // 2. Trava o botão e mostra "Carregando..."
             btnLogin.disabled = true;
             btnLogin.textContent = 'Carregando...';
             formMensagem.textContent = '';
-            
             try {
-                // 3. CHAMA O NOSSO "ROBÔ" (o arquivo login.js no Netlify)
                 const response = await fetch('/.netlify/functions/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nome, email, whatsapp })
                 });
-
                 const data = await response.json();
-
-                if (!response.ok) {
-                    // Se o robô responder com erro
-                    throw new Error(data.erro || 'Falha ao fazer login.');
-                }
-
-                // 4. SUCESSO!
+                if (!response.ok) { throw new Error(data.erro || 'Falha ao fazer login.'); }
                 formMensagem.style.color = '#D4AF37';
                 formMensagem.textContent = 'Sucesso! Redirecionando...';
-
-                // ** IMPORTANTE: Salva os dados do usuário na "memória" do navegador **
-                // É assim que a próxima página (gerador.html) saberá QUEM ele é.
                 localStorage.setItem('usuario_email', data.email);
                 localStorage.setItem('usuario_creditos', data.creditos);
-
-                // 5. Redireciona para o gerador
                 setTimeout(() => {
                     window.location.href = 'gerador.html';
-                }, 1000); // 1 segundo
-
+                }, 1000); 
             } catch (error) {
-                // 6. DEU RUIM
                 formMensagem.style.color = '#FF5555';
                 formMensagem.textContent = error.message;
                 btnLogin.disabled = false;

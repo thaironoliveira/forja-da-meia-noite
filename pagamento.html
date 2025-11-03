@@ -21,7 +21,7 @@
                 <div class="preco">R$ 7,00<span>Pagamento único</span></div>
                 <ul class="beneficios-lista">
                     <li>✅ <strong>1 Crédito</strong> Premium</li>
-                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Use na Roda Numérica</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
                 <button class="btn-pagar" data-plano-id="plano_1">Comprar 1 Crédito</button>
@@ -32,7 +32,7 @@
                 <div class="preco">R$ 14,00<span>Pagamento único</span></div>
                 <ul class="beneficios-lista">
                     <li>✅ <strong>3 Créditos</strong> Premium</li>
-                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Use na Roda Numérica</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
                 <button class="btn-pagar" data-plano-id="plano_2">Comprar 3 Créditos</button>
@@ -44,7 +44,7 @@
                 <ul class="beneficios-lista">
                     <li>✅ <strong>Créditos ILIMITADOS</strong></li>
                     <li>✅ Acesso <strong>vitalício</strong></li>
-                    <li>✅ Use na Tabela Quadrada</li>
+                    <li>✅ Use na Roda Numérica</li>
                     <li>✅ Download em SVG (Vetor)</li>
                 </ul>
                 <button class="btn-pagar" data-plano-id="plano_3">Tornar-se Mestre</button>
@@ -54,15 +54,17 @@
         <p id="msgStatus" class="msg-sucesso"></p>
     </div>
 
+    <footer class="site-footer">
+        © 2025 Forja da Meia Noite. Todos os direitos reservados.
+    </footer>
+
     <script>
         const btnsPagamento = document.querySelectorAll('.btn-pagar');
         const msgStatus = document.getElementById('msgStatus');
         const emailUsuario = localStorage.getItem('usuario_email');
 
         // ** A CURA DO BOTÃO PRESO **
-        // Esta função roda toda vez que a página (re)aparece
         window.addEventListener('pageshow', function(event) {
-            // Re-abilita todos os botões e limpa a mensagem
             btnsPagamento.forEach(b => b.disabled = false);
             msgStatus.textContent = '';
         });
@@ -78,13 +80,11 @@
                 
                 const planoId = botao.dataset.planoId;
 
-                // 2. Trava os botões
                 btnsPagamento.forEach(b => b.disabled = true);
                 msgStatus.style.color = '#D4AF37';
                 msgStatus.textContent = 'Conectando ao Mercado Pago...';
 
                 try {
-                    // 3. CHAMA O ROBÔ 1 (criar-pagamento.js)
                     const response = await fetch('/.netlify/functions/criar-pagamento', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -97,14 +97,12 @@
                     const data = await response.json();
                     if (!response.ok) { throw new Error(data.erro || 'Falha ao criar link de pagamento.'); }
 
-                    // 4. SUCESSO!
                     msgStatus.textContent = 'Redirecionando para o pagamento...';
                     window.location.href = data.link_pagamento;
 
                 } catch (error) {
                     msgStatus.style.color = '#FF5555';
                     msgStatus.textContent = error.message;
-                    // Re-abilita botões se der erro
                     btnsPagamento.forEach(b => b.disabled = false);
                 }
             });
