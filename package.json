@@ -4,5 +4,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
     "mercadopago": "^1.5.17"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node --test"
   }
 }
